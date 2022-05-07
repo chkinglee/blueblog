@@ -1,0 +1,17 @@
+server:
+  port: 9091
+
+logger:
+  file: /tmp/blues/blueblog/blueblog-interface.log
+  level: debug
+
+language:
+  local: "zh-cn"
+
+redis:
+  addr: "10.69.77.221:8901"
+  db: "0"
+  maxRetries: 3
+  minIdleConns: 5
+  pass: "Root1234"
+  poolSize: 10
