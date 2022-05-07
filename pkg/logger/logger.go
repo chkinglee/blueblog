@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -27,27 +28,20 @@ type option struct {
 	disableConsole bool
 }
 
-func WithLevelDebug() Option {
+func WithLevel(level string) Option {
 	return func(o *option) {
-		o.level = zapcore.DebugLevel
-	}
-}
-
-func WithLevelInfo() Option {
-	return func(o *option) {
-		o.level = zapcore.InfoLevel
-	}
-}
-
-func WithLevelWarn() Option {
-	return func(o *option) {
-		o.level = zapcore.WarnLevel
-	}
-}
-
-func WithLevelError() Option {
-	return func(o *option) {
-		o.level = zapcore.ErrorLevel
+		switch strings.ToLower(level) {
+		case "debug":
+			o.level = zapcore.DebugLevel
+		case "info":
+			o.level = zapcore.InfoLevel
+		case "warn":
+			o.level = zapcore.WarnLevel
+		case "error":
+			o.level = zapcore.ErrorLevel
+		default:
+			o.level = zapcore.InfoLevel
+		}
 	}
 }
 
