@@ -16,6 +16,15 @@ import (
 var config = new(Config)
 
 type Config struct {
+	Server struct {
+		Port int `yaml:"port"`
+	} `yaml:"server"`
+
+	Logger struct {
+		File  string `yaml:"file"`
+		Level string `yaml:"level"`
+	} `yaml:"logger"`
+
 	MySQL struct {
 		Read struct {
 			Addr string `yaml:"addr"`
@@ -62,10 +71,9 @@ type Config struct {
 	Language struct {
 		Local string `yaml:"local"`
 	} `yaml:"language"`
-
 }
 
-func init() {
+func Init() {
 	viper.SetConfigName(fmt.Sprintf("%s-%s", env.Active().App(), env.Active().Value()))
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./configs")
