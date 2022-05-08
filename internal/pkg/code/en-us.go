@@ -82,4 +82,10 @@ var enUSText = map[int]string{
 	CronDetailError:  "Failed to get cron detail",
 	CronExecuteError: "Failed to execute cron",
 
+	ArticleCreateError:       "Failed to create article",
+	ArticleUpdateError:       "Failed to update article",
+	ArticleDeleteError:       "Failed to delete article",
+	ArticleListError:         "Failed to get article list",
+	ArticleDetailError:       "Failed to get article details",
+
 }

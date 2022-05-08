@@ -240,6 +240,13 @@ func (c *context) getPayload() interface{} {
 }
 
 func (c *context) Payload(payload interface{}) {
+	payload = &struct {
+		Body    interface{} `json:"body"`
+		TraceId string      `json:"trace_id"`
+	}{
+		Body: payload,
+		TraceId: c.Trace().ID(),
+	}
 	c.ctx.Set(_PayloadName, payload)
 }
 

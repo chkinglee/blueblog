@@ -5,9 +5,12 @@
 package main
 
 import (
-	"blueblog/internal/app/blueblog-interface/router"
+	"blueblog/api/blueblog-interface/api"
 	"blueblog/internal/pkg/configs"
+	"blueblog/internal/pkg/core"
+	"blueblog/internal/pkg/router"
 	"blueblog/pkg/env"
+	"blueblog/pkg/errors"
 	"blueblog/pkg/logger"
 	"blueblog/pkg/shutdown"
 	"blueblog/pkg/time_parse"
@@ -40,7 +43,7 @@ func main() {
 	}()
 
 	// 初始化 HTTP 服务
-	s, err := router.NewHTTPServer(accessLogger)
+	s, err := NewHTTPServer(accessLogger)
 	if err != nil {
 		panic(err)
 	}
@@ -69,4 +72,33 @@ func main() {
 		},
 	)
 
+}
+
+func NewHTTPServer(logger *zap.Logger) (*router.Server, error) {
+	if logger == nil {
+		return nil, errors.New("logger required")
+	}
+
+	r := new(router.Resource)
+	r.Logger = logger
+
+	mux, err := core.New(logger,
+		core.WithEnableCors(),
+		core.WithEnableRate(),
+		//core.WithRecordMetrics(metrics.RecordMetrics),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	r.Mux = mux
+
+	// 设置 API 路由
+	api.SetApiRouter(r)
+
+	s := new(router.Server)
+	s.Mux = mux
+
+	return s, nil
 }

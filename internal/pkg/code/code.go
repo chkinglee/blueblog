@@ -100,6 +100,12 @@ const (
 	CronListError    = 20403
 	CronDetailError  = 20404
 	CronExecuteError = 20405
+
+	ArticleCreateError = 20501
+	ArticleUpdateError = 20502
+	ArticleDeleteError = 20503
+	ArticleListError   = 20504
+	ArticleDetailError = 20505
 )
 
 func Text(code int) string {
