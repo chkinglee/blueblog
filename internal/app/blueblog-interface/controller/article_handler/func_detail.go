@@ -6,8 +6,10 @@ package article_handler
 
 import (
 	"blueblog/internal/pkg/code"
+	"blueblog/internal/pkg/configs"
 	"blueblog/internal/pkg/core"
 	"blueblog/pkg/errno"
+	"errors"
 	"net/http"
 )
 
@@ -33,7 +35,7 @@ type detailResponse struct {
 // @Param Request body detailRequest true "请求信息"
 // @Success 200 {object} detailResponse
 // @Failure 400 {object} code.Failure
-// @Router /api/{uid}/article/{id} [get]
+// @Router /api/article/{uid}/{id} [get]
 func (h *handler) Detail() core.HandlerFunc {
 	return func(c core.Context) {
 		req := new(detailRequest)
@@ -54,6 +56,14 @@ func (h *handler) Detail() core.HandlerFunc {
 
 		info, err := h.articleService.Detail(c, req.Uid, req.Id)
 		if err != nil {
+			if errors.As(err, &configs.ErrNotExist) {
+				c.AbortWithError(errno.NewError(
+					http.StatusBadRequest,
+					code.ArticleNotExist,
+					code.Text(code.ArticleNotExist)).WithErr(err),
+				)
+				return
+			}
 			c.AbortWithError(errno.NewError(
 				http.StatusBadRequest,
 				code.ArticleDetailError,

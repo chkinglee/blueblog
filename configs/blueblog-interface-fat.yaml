@@ -1,5 +1,10 @@
 server:
-  port: 9091
+  httpPort: 9091
+
+blues:
+  blueblog:
+    service:
+      addr: "127.0.0.1:9093"
 
 logger:
   file: /tmp/blues/blueblog/blueblog-interface.log

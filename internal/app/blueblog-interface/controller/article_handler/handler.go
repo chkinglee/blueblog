@@ -17,22 +17,22 @@ type Handler interface {
 
 	// Create 创建/修改
 	// @Tags API.article
-	// @Router /api/{uid}/article [post]
+	// @Router /api/article/{uid} [post]
 	Create() core.HandlerFunc
 
 	// Detail 详情
 	// @Tags API.article
-	// @Router /api/{uid}/article/{id} [get]
+	// @Router /api/article/{uid}/{id} [get]
 	Detail() core.HandlerFunc
 
 	// Delete 删除
 	// @Tags API.article
-	// @Router /api/{uid}/article/{id} [delete]
+	// @Router /api/article/{uid}/{id} [delete]
 	Delete() core.HandlerFunc
 
 	// List 列表
 	// @Tags API.article
-	// @Router /api/{uid}/article [get]
+	// @Router /api/article/{uid} [get]
 	List() core.HandlerFunc
 }
 

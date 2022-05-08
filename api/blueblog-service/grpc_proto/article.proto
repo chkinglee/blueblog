@@ -1,0 +1,25 @@
+syntax = "proto3"; //指定proto版本
+
+option go_package = "./;grpc_proto";
+
+package grpc_proto;
+
+message Article {
+  string title = 1;
+  string content = 2;
+  string createTime = 3;
+}
+
+message DetailRequest {
+  string traceId = 1;
+  string uid = 2;
+  string id = 3;
+}
+
+message DetailResponse {
+  Article article = 1;
+}
+
+service ArticleService {
+  rpc Detail(DetailRequest) returns (DetailResponse){}
+}
