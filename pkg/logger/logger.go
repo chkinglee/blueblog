@@ -5,6 +5,7 @@
 package logger
 
 import (
+	"blueblog/internal/pkg/core"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"io"
@@ -73,6 +74,22 @@ func WithDisableConsole() Option {
 	}
 }
 
+func InfoT(ctx core.StdContext, msg string, fields ...zap.Field) {
+	ctx.Logger.Info(msg, append(fields, zap.String("trace_id", ctx.Trace.ID()))...)
+}
+
+func DebugT(ctx core.Context, msg string, fields ...zap.Field) {
+	ctx.Logger().Debug(msg, append(fields, zap.String("trace_id", ctx.Trace().ID()))...)
+}
+
+func WarnT(ctx core.Context, msg string, fields ...zap.Field) {
+	ctx.Logger().Warn(msg, append(fields, zap.String("trace_id", ctx.Trace().ID()))...)
+}
+
+func ErrorT(ctx core.StdContext, msg string, fields ...zap.Field) {
+	ctx.Logger.Error(msg, append(fields, zap.String("trace_id", ctx.Trace.ID()))...)
+}
+
 func NewJSONLogger(opts ...Option) (*zap.Logger, error) {
 	opt := &option{level: DefaultLevel}
 	for _, f := range opts {
@@ -115,10 +132,10 @@ func NewJSONLogger(opts ...Option) (*zap.Logger, error) {
 	stdout := zapcore.Lock(os.Stdout) // lock for concurrent safe
 	stderr := zapcore.Lock(os.Stderr) // lock for concurrent safe
 
-	core := zapcore.NewTee()
+	tee := zapcore.NewTee()
 
 	if !opt.disableConsole {
-		core = zapcore.NewTee(
+		tee = zapcore.NewTee(
 			zapcore.NewCore(jsonEncoder,
 				zapcore.NewMultiWriteSyncer(stdout),
 				lowPriority,
@@ -131,7 +148,7 @@ func NewJSONLogger(opts ...Option) (*zap.Logger, error) {
 	}
 
 	if opt.file != nil {
-		core = zapcore.NewTee(core,
+		tee = zapcore.NewTee(tee,
 			zapcore.NewCore(jsonEncoder,
 				zapcore.AddSync(opt.file),
 				zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
@@ -141,7 +158,7 @@ func NewJSONLogger(opts ...Option) (*zap.Logger, error) {
 		)
 	}
 
-	logger := zap.New(core,
+	logger := zap.New(tee,
 		zap.AddCaller(),
 		zap.ErrorOutput(stderr),
 	)

@@ -106,6 +106,7 @@ const (
 	ArticleDeleteError = 20503
 	ArticleListError   = 20504
 	ArticleDetailError = 20505
+	ArticleNotExist    = 20506
 )
 
 func Text(code int) string {

@@ -17,8 +17,29 @@ var config = new(Config)
 
 type Config struct {
 	Server struct {
-		Port int `yaml:"port"`
+		HttpPort int `yaml:"httpPort"`
+		GrpcPort int `yaml:"grpcPort"`
 	} `yaml:"server"`
+
+	Blues struct {
+		Blueblog struct {
+			Interface struct {
+				Addr string `yaml:"addr"`
+			} `yaml:"interface"`
+			Service struct {
+				Addr string `yaml:"addr"`
+			} `yaml:"service"`
+			Job struct {
+				Addr string `yaml:"addr"`
+			} `yaml:"job"`
+			Task struct {
+				Addr string `yaml:"addr"`
+			} `yaml:"task"`
+			Admin struct {
+				Addr string `yaml:"addr"`
+			} `yaml:"admin"`
+		} `yaml:"blueblog"`
+	} `yaml:"blues"`
 
 	Logger struct {
 		File  string `yaml:"file"`

@@ -89,4 +89,5 @@ var zhCNText = map[int]string{
 	ArticleDeleteError: "删除文章失败",
 	ArticleListError:   "获取文章列表失败",
 	ArticleDetailError: "获取文章详情失败",
+	ArticleNotExist:    "文章不存在",
 }
