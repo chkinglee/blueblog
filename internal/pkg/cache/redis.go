@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -41,6 +42,7 @@ type Repo interface {
 	Close() error
 
 	HMGet(key string, fields []string, options ...Option) ([]interface{}, error)
+	HSet(key string, values []interface{}, options ...Option) (int64, error)
 	HKeys(key string, options ...Option) ([]string, error)
 }
 
@@ -152,6 +154,31 @@ func (c *cacheRepo) HMGet(key string, fields []string, options ...Option) ([]int
 	value, err := c.client.HMGet(key, fields...).Result()
 	if err != nil {
 		return nil, errors.Wrapf(err, "redis get key: %s err", key)
+	}
+
+	return value, nil
+}
+
+func (c *cacheRepo) HSet(key string, values []interface{}, options ...Option) (int64, error) {
+	ts := time.Now()
+	opt := newOption()
+	defer func() {
+		if opt.Trace != nil {
+			opt.Redis.Timestamp = time_parse.CSTLayoutString()
+			opt.Redis.Handle = "HSet"
+			opt.Redis.Key = key + "----" + fmt.Sprint(values...)
+			opt.Redis.CostSeconds = time.Since(ts).Seconds()
+			opt.Trace.AppendRedis(opt.Redis)
+		}
+	}()
+
+	for _, f := range options {
+		f(opt)
+	}
+
+	value, err := c.client.HSet(key, values...).Result()
+	if err != nil {
+		return 0, errors.Wrapf(err, "redis hset key: %s err", key)
 	}
 
 	return value, nil

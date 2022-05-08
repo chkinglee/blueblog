@@ -1,9 +1,8 @@
 server:
-  httpPort: 9092
-  grpcPort: 9093
+  httpPort: 9094
 
 logger:
-  file: /tmp/blues/blueblog/blueblog-service.log
+  file: /tmp/blues/blueblog/blueblog-job.log
   level: debug
 
 language:

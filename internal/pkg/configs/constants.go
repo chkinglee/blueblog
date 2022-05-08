@@ -17,7 +17,8 @@ const (
 
 	CacheKey4Article = "blues:" + ProjectName + ":article:%s:%s"
 
-
+	MQExchange = "blues:" + ProjectName
+	MQRoutingKey4Article = MQExchange + ":article:%s"
 
 	// HeaderSignToken 签名验证 Token，Header 中传递的参数
 	HeaderSignToken = "Authorization"

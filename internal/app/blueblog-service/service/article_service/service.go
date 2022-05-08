@@ -30,14 +30,11 @@ type service struct {
 }
 
 type Article struct {
-	Exist      string
-	Title      string
-	Content    string
-	CreateTime string
+	Exist      interface{}
 }
 
 func (a *Article) IsExist() bool {
-	return strings.ToLower(a.Exist) == "true"
+	return a.Exist != nil && strings.ToLower(a.Exist.(string)) == "true"
 }
 
 func (s *service) Detail(ctx context.Context, req *grpc_proto.DetailRequest) (res *grpc_proto.DetailResponse, err error) {
@@ -62,7 +59,7 @@ func (s *service) Detail(ctx context.Context, req *grpc_proto.DetailRequest) (re
 		}
 		logger.InfoT(stdCtx, "get values from cache", zap.Any("values", values))
 		article := Article{
-			Exist: values[0].(string),
+			Exist: values[0],
 		}
 		if article.IsExist() {
 			res.Article = &grpc_proto.Article{
@@ -77,7 +74,21 @@ func (s *service) Detail(ctx context.Context, req *grpc_proto.DetailRequest) (re
 		}
 	} else {
 		// 通知blueblog-job缓存该数据
+		go func() {
+			data := map[string]interface{}{
+				"uid": req.Uid,
+				"id": req.Id,
+			}
 
+			err = s.rp.GetRabbitMQ().Publish(
+				configs.MQExchange,
+				fmt.Sprintf(configs.MQRoutingKey4Article, "read"),
+				data,
+			)
+			if err != nil {
+				logger.ErrorT(stdCtx, "send message to MQ err.", zap.Error(err))
+			}
+		}()
 		// cache中查不到的话直接查db
 		logger.InfoT(stdCtx, "cache miss and then query db")
 		qb := article_repo.NewQueryBuilder()

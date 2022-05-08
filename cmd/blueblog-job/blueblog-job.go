@@ -1,11 +1,11 @@
-// Package blueblog_service
+// Package blueblog_job
 // @Author      : lilinzhen
-// @Time        : 2022/5/8 14:47:49
+// @Time        : 2022/5/8 20:12:43
 // @Description :
 package main
 
 import (
-	"blueblog/api/blueblog-service/api"
+	"blueblog/internal/app/blueblog-job/job/article-job"
 	"blueblog/internal/pkg/configs"
 	"blueblog/internal/pkg/core"
 	"blueblog/internal/pkg/repo"
@@ -18,14 +18,12 @@ import (
 	"context"
 	"fmt"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"net"
 	"net/http"
 	"time"
 )
 
 func init() {
-	env.Active().WithApp(configs.AppNameForService)
+	env.Active().WithApp(configs.AppNameForJob)
 	configs.Init()
 }
 
@@ -69,20 +67,7 @@ func main() {
 		}
 	}()
 
-	// 初始化 gRPC 服务
-	grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%d", configs.Get().Server.GrpcPort))
-	if err != nil {
-		accessLogger.Fatal("failed to listen", zap.Error(err))
-	}
-	grpcServer := grpc.NewServer()
-	api.SetGrpcRegister(grpcServer, accessLogger, rp)
-	accessLogger.Info("gRPC server listen on " + fmt.Sprintf(":%d", configs.Get().Server.GrpcPort))
-
-	go func() {
-		if err := grpcServer.Serve(grpcListener); err != nil && err != grpc.ErrServerStopped {
-			accessLogger.Fatal("gRPC server startup err", zap.Error(err))
-		}
-	}()
+	go article_job.ReadArticle(accessLogger, rp)
 
 	// 优雅关闭
 	shutdown.NewHook().Close(
@@ -96,17 +81,10 @@ func main() {
 			}
 		},
 
-		// 关闭 grpc server
-		func() {
-			grpcServer.Stop()
-		},
-
-
 		// 关闭 repo 连接
 		func() {
 			rp.Close(accessLogger)
 		},
-
 	)
 
 }

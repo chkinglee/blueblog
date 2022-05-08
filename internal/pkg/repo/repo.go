@@ -8,7 +8,6 @@ import (
 	"blueblog/internal/pkg/cache"
 	"blueblog/internal/pkg/db"
 	"blueblog/internal/pkg/message_queue"
-
 	"go.uber.org/zap"
 )
 
@@ -61,6 +60,10 @@ func (r *repo) GetCache() cache.Repo {
 }
 
 func (r *repo) GetRabbitMQ() message_queue.RabbitMQRepo {
+	if r.rabbitmq.IsClosed() {
+		rabbitmqRepo, _ := message_queue.RabbitMQNew()
+		r.rabbitmq = rabbitmqRepo
+	}
 	return r.rabbitmq
 }
 
